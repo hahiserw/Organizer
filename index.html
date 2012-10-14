@@ -1,0 +1,101 @@
+﻿<!doctype html>
+<html>
+
+<head>
+
+	<meta http-equiv="charset" content="text/html; charset=utf-8" />
+	<title>Plan tygodnia</title>
+
+	<script src="abstract.js"></script>
+	<script>
+
+		// ( function() {
+
+		var days = [ "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela" ];
+
+		document.addEventListener( "DOMContentLoaded", function() {
+			var table = document.getElementById( "table" );
+			for( var i = 0; i < 7; i++ ) {
+				var day = document.createElement( "div" );
+				day.className = "day";
+				day.id = "day" + i;
+				day.appendChild(
+					document.createElement( "div" )
+						.appendChild( document.createTextNode( days[i] ) )
+				);
+				table.appendChild( day );
+			}
+			world = new World();
+			world.addEvent( new Event( "teraz", "10min", +new Date(), 10 * 60 * 1000 ) );
+			world.addEvent( new Event( "teraz + 60min", "trwam godzinę", ( ( +new Date() ) + 60 * 60 * 1000 ), 60 * 60 * 1000 ) );
+			document.getElementById( "refresh" ).addEventListener( "click", function() {
+				var scale = 24 * 60 * 60 * 1000;
+				var day = 0;
+				var events = world.getDayEvents( +new Date(), day );
+				for( var i in events ) {
+					var event = document.createElement( "div" );
+					var description = document.createElement( "div" );
+					event.appendChild( document.createTextNode( events[i].name ) );
+					event.className = "event";
+					event.style.height = ( events[i].span / scale ) * 100 + "%";
+					// Winien być niestatyczny rozmiar. Wysokość ma 24 godziny.
+					event.style.top = ( ( events[i].start % scale ) / scale ) * 100 + "%";
+					description.className = "description";
+					description.appendChild( document.createTextNode( events[i].description ) );
+					event.appendChild( description );
+					document.getElementById( "day" + day ).appendChild( event );
+				}
+			}, false );
+		} );
+
+		// } () )
+
+	</script>
+
+	<style>
+
+		* {
+			font-family: sans-serif;
+		}
+
+		.day {
+			position: relative;
+			float: left;
+			width: 14%; /* 7 columns. Will be 10 columnt grid, I think. */
+		}
+		.event {
+			position: absolute;
+			background-color: lightblue;
+		}
+
+		.description {
+			background-color: lightyellow;
+			position: relative;
+			display: none;
+		}
+		.event:hover > .description {
+			display: block;
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+	<div class="wrapper">
+
+		<div>
+			<input type="button" value="refresh" id="refresh" />
+		</div>
+
+		<div class="slider">
+			<div id="table">
+			</div>
+		</div>
+
+	</div>
+
+</body>
+
+</html>
